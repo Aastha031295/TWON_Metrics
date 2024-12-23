@@ -23,8 +23,8 @@ MODELS = [
 options = {'seed': 42, 'temperature': 0.8, 'num_predict': 128}
 
 PROMPT = """
-You are a specialized content analyzer focused on identifying potential misinformation, hate speech and toxicity in social media posts. Your task is to classify tweets into two categories of each:
- neutral_post or possible_fake_news, neutral_comment or possible_hate_speech and non_toxic or possible_toxic.
+You are a specialized content analyzer focused on identifying potential misinformation (fake news), hate speech and toxicity in social media posts or tweets. Your task is to classify tweets into two categories of each:
+neutral_post (0) or possible_fake_news (1), neutral_comment (0) or possible_hate_speech (1) and non_toxic (0) or possible_toxic (1).
 
 Fake News Characteristics: 
 
@@ -42,7 +42,7 @@ Fake News Characteristics:
 - Information that is created by a political entity to influence public opinion and gain support for a public figure, organization or government.
 - Posts that are pure opinion, comics, satire, or any other posts that do not make a factual claim. This is also the category to use for posts that are of the "Like this if you think..." variety.
 
-If the tweets exhibits one of the above described charactericts classify it possible_fake_news else classify it as neutral_post. 
+If the tweets exhibits one of the above described charactericts classify it possible_fake_news (1) else classify it as neutral_post (0). 
 
 Hate Speech Characteristics:
 -Hate speech targets individuals or groups explicitly or implicitly.
@@ -53,7 +53,7 @@ Race, Religion, Gender, Sexual Orientation, Disability and Socioeconomic Status 
 -It can be overtly abusive or manifest through subtler, more implicit expressions (e.g., stereotypes or insinuations).
 -Language that aims to demean, harm, exclude, or perpetuate discrimination against protected groups or individuals.
 
-If the tweets exhibits one of the above described charactericts classify it possible_hate_speech else classify it as neutral_comment.
+If the tweets exhibits one of the above described charactericts classify it possible_hate_speech (1) else classify it as neutral_comment (0).
 
 Toxicity Characteristics:
 -Use of language that is rude, disrespectful, or likely to offend individuals or groups.
@@ -63,34 +63,42 @@ Toxicity Characteristics:
 -Use of vulgar or obscene language that contributes to a hostile environment.
 -Statements that imply or directly express an intention to inflict harm or violence.
 
-If the tweets exhibits one of the above described charactericts classify it possible_toxic else classify it as non_toxic.
+If the tweets exhibits one of the above described charactericts classify it possible_toxic (1) else classify it as non_toxic (0).
 
 
-Always Respond only with all the given classnames without missing a single class. Omit justifications
+Always respond only with all the given classnames without missing a single class. Omit justifications.
+
+Response should always be followed in the order as misinformation (fake news), hate speech and toxicity respectively.
+You should only respond with 0 or 1 for each class as the final response.
 
 Examples:
 
 Frauen gehören in die Küche, nicht ins Büro. Sie sind einfach nicht dafür gemacht!
-neutral_post, possible_hate_speech, non_toxic
+Just for understanding, not to return- neutral_post, possible_hate_speech, non_toxic
+Returned final response: 0,1,0
 
 Alle Ausländer nehmen uns die Jobs weg und ruinieren unsere Wirtschaft. Bald wird es keine Deutschen mehr geben!
-possible_fake_news, possible_hate_speech, possible_toxic
+Just for understanding, not to return- possible_fake_news, possible_hate_speech, possible_toxic
+Returned final response: 1,1,1
 
 Die Regierung unterstützt illegale Migranten mit kostenlosen Villen, während wir Steuern zahlen. Pure Diskriminierung gegen uns Deutsche!
-possible_fake_news, possible_hate_speech, possible_toxic
+Just for understanding, not to return- possible_fake_news, possible_hate_speech, possible_toxic
+Returned final response: 1,1,1
 
 Die Regierung plant heimlich, alle Bargeldzahlungen abzuschaffen, damit sie uns total kontrollieren können. Wach endlich auf, du Schaf!
-possible_fake_news,neutral_comment, possible_toxic
+Just for understanding, not to return- possible_fake_news, neutral_comment, possible_toxic
+Returned final response: 1,0,1
+
 """
 
-def call(tweet):
-    print("Calling the API with the tweet:", tweet)
+def predict(tweet):
+    print("Calling the API....")
     messages = [{'role': 'system', 'content': PROMPT}, {'role': 'user', 'content': tweet}]
 
     response = requests.post(
         endpoint,
         json={
-                "model": MODELS[1],
+                "model": MODELS[0],
                 "messages": messages,
                 "options": options
             },
@@ -103,7 +111,7 @@ while True:
     if tweet == "exit":
         break
     
-    api_response = call(tweet)
+    api_response = predict(tweet)
 
     # print(api_response)
     print("############")
