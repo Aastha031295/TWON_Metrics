@@ -7,31 +7,16 @@ import requests
 
 from prompt import CLASSIFICATION_PROMPT
 
-USE_UNI_LLM_API: bool = True
-UNI_LLM_API: str = "https://inf.cl.uni-trier.de/chat/"
-TEMPERATURE = 0.2  # deterministic output
+from config import USE_UNI_LLM_API, UNI_MODELS, TEMPERATURE
 
-MODELS = [
-    # LLama (MetaAI)
-    "llama3.1:8b-instruct-q6_K",
-    "llama3.1:70b-instruct-q6_K",
-    "llama3.3:70b-instruct-q6_K",
-    # Mi(s/x)tral (Mistral AI)
-    "mistral:7b-instruct-v0.2-q6_K",
-    "mixtral:8x7b-instruct-v0.1-q6_K",
-    # Phi (Mircosoft)
-    "phi3:14b-medium-128k-instruct-q6_K",
-    "phi3.5:3.8b-mini-instruct-q6_K",
-    # Gemma (Google)
-    "gemma:7b-instruct-q6_K",
-    "gemma2:27b-instruct-q6_K",
-    # QWEN (Alibaba)
-    "qwen2:72b-instruct-q6_K",
-]
+
+UNI_LLM_API: str = "https://inf.cl.uni-trier.de/chat/"
+
 
 options = {"seed": 42, "temperature": TEMPERATURE, "num_predict": 128}
 
-def predict_with_uni_llm(tweet, model=MODELS[0]):
+
+def predict_with_uni_llm(tweet):
     messages = [
         {"role": "system", "content": CLASSIFICATION_PROMPT},
         {"role": "user", "content": tweet},
@@ -39,13 +24,14 @@ def predict_with_uni_llm(tweet, model=MODELS[0]):
 
     response = requests.post(
         UNI_LLM_API,
-        json={"model": model, "messages": messages, "options": options},
+        json={"model": UNI_MODELS, "messages": messages, "options": options},
     ).json()
     return response["response"]
+
 
 def predict(tweet):
     if USE_UNI_LLM_API:
         return predict_with_uni_llm(tweet)
     else:
         pass
-        # return predict_with_huggingface(tweet, model)
+        # return predict_with_huggingface(tweet)

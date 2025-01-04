@@ -6,7 +6,7 @@ import pandas as pd
 import sklearn.metrics
 from inference import predict
 
-SAMPLE_COUNT = 50 # Number of samples to evaluate
+from config import SAMPLE_COUNT
 
 # Load the dataset
 balanced_dataset_main_df = pd.read_csv("cleaned_dataset.csv")
