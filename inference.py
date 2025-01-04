@@ -7,6 +7,7 @@ import requests
 
 from prompt import CLASSIFICATION_PROMPT
 
+USE_UNI_LLM_API: bool = True
 UNI_LLM_API: str = "https://inf.cl.uni-trier.de/chat/"
 TEMPERATURE = 0.2  # deterministic output
 
@@ -30,8 +31,7 @@ MODELS = [
 
 options = {"seed": 42, "temperature": TEMPERATURE, "num_predict": 128}
 
-
-def predict(tweet, model=MODELS[0]):
+def predict_with_uni_llm(tweet, model=MODELS[0]):
     messages = [
         {"role": "system", "content": CLASSIFICATION_PROMPT},
         {"role": "user", "content": tweet},
@@ -42,3 +42,10 @@ def predict(tweet, model=MODELS[0]):
         json={"model": model, "messages": messages, "options": options},
     ).json()
     return response["response"]
+
+def predict(tweet):
+    if USE_UNI_LLM_API:
+        return predict_with_uni_llm(tweet)
+    else:
+        pass
+        # return predict_with_huggingface(tweet, model)
