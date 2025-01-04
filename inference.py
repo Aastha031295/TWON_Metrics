@@ -33,5 +33,5 @@ def predict(tweet):
     if USE_UNI_LLM_API:
         return predict_with_uni_llm(tweet)
     else:
-        pass
+        raise NotImplementedError("HuggingFace not implemented yet.")
         # return predict_with_huggingface(tweet)
