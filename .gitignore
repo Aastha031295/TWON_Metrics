@@ -122,6 +122,4 @@ dmypy.json
 
 #local files
 test.ipynb
-output.csv
-balanced_dataset.csv
-cleaned_dataset.csv
+*.csv

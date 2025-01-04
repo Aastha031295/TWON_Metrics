@@ -3,13 +3,20 @@ This script is used to evaluate the model by comparing the predicted labels with
 """
 
 import pandas as pd
-import sklearn.metrics
+from sklearn.metrics import classification_report
 from inference import predict
 
-from config import SAMPLE_COUNT
+from config import SAMPLE_COUNT, USE_UNI_LLM_API, UNI_MODEL, HG_MODEL, DATA_PATH
+
+model_in_use = UNI_MODEL if USE_UNI_LLM_API else HG_MODEL
+print(f"Using model: {model_in_use}")
+print(f"Sample count: {SAMPLE_COUNT}")
+print("Evaluating... ⏳")
+
+model_in_use_fmt = model_in_use.replace(":", "_").replace("/", "_")
 
 # Load the dataset
-balanced_dataset_main_df = pd.read_csv("cleaned_dataset.csv")
+balanced_dataset_main_df = pd.read_csv(DATA_PATH)
 # Sample the dataset
 balanced_dataset_df = balanced_dataset_main_df.sample(SAMPLE_COUNT)
 
@@ -50,21 +57,31 @@ balanced_dataset_df["toxicity_predicted"] = balanced_dataset_df[
 ].fillna(balanced_dataset_df["toxicity"])
 
 # Saving data in local file
-balanced_dataset_df.to_csv("output.csv", index=False)
+balanced_dataset_df.to_csv(f"output_{model_in_use_fmt}.csv", index=False)
 
 # Generate classification reports
-print(
-    sklearn.metrics.classification_report(
-        balanced_dataset_df["fake"], balanced_dataset_df["fake_news_predicted"]
-    )
+fake_report = classification_report(
+    balanced_dataset_df["fake"], balanced_dataset_df["fake_news_predicted"], output_dict=True
 )
-print(
-    sklearn.metrics.classification_report(
-        balanced_dataset_df["hatespeech"], balanced_dataset_df["hate_speech_predicted"]
-    )
+fake_report_df = pd.DataFrame(fake_report).transpose()
+fake_report_df['category'] = 'fake'
+
+hatespeech_report = classification_report(
+    balanced_dataset_df["hatespeech"], balanced_dataset_df["hate_speech_predicted"], output_dict=True
 )
-print(
-    sklearn.metrics.classification_report(
-        balanced_dataset_df["toxicity"], balanced_dataset_df["toxicity_predicted"]
-    )
+hatespeech_report_df = pd.DataFrame(hatespeech_report).transpose()
+hatespeech_report_df['category'] = 'hatespeech'
+
+toxicity_report = classification_report(
+    balanced_dataset_df["toxicity"], balanced_dataset_df["toxicity_predicted"], output_dict=True
 )
+toxicity_report_df = pd.DataFrame(toxicity_report).transpose()
+toxicity_report_df['category'] = 'toxicity'
+
+# Concatenate all reports into a single DataFrame
+combined_report_df = pd.concat([fake_report_df, hatespeech_report_df, toxicity_report_df])
+
+# Save the combined report to a CSV file
+combined_report_df.to_csv(f"eval_{model_in_use_fmt}.csv", index=True)
+
+print(f"Evaluation completed. Check the output files ({model_in_use_fmt}).")

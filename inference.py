@@ -7,7 +7,7 @@ import requests
 
 from prompt import CLASSIFICATION_PROMPT
 
-from config import USE_UNI_LLM_API, UNI_MODELS, TEMPERATURE
+from config import USE_UNI_LLM_API, UNI_MODEL, TEMPERATURE
 
 
 UNI_LLM_API: str = "https://inf.cl.uni-trier.de/chat/"
@@ -24,7 +24,7 @@ def predict_with_uni_llm(tweet):
 
     response = requests.post(
         UNI_LLM_API,
-        json={"model": UNI_MODELS, "messages": messages, "options": options},
+        json={"model": UNI_MODEL, "messages": messages, "options": options},
     ).json()
     return response["response"]
 
