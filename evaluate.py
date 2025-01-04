@@ -6,11 +6,12 @@ import pandas as pd
 import sklearn.metrics
 from inference import predict
 
+SAMPLE_COUNT = 50 # Number of samples to evaluate
+
 # Load the dataset
 balanced_dataset_main_df = pd.read_csv("cleaned_dataset.csv")
-
 # Sample the dataset
-balanced_dataset_df = balanced_dataset_main_df.sample(20, random_state=42)
+balanced_dataset_df = balanced_dataset_main_df.sample(SAMPLE_COUNT)
 
 # Apply the prediction function
 balanced_dataset_df["response"] = balanced_dataset_df["text"].apply(predict)
