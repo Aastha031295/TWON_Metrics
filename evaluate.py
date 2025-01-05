@@ -49,9 +49,9 @@ balanced_dataset_df["toxicity_predicted"] = pd.to_numeric(
 )
 
 # Ensure the true labels are also integers
-balanced_dataset_df["fake"] = balanced_dataset_df["fake"].astype(int)
-balanced_dataset_df["hatespeech"] = balanced_dataset_df["hatespeech"].astype(int)
-balanced_dataset_df["toxicity"] = balanced_dataset_df["toxicity"].astype(int)
+balanced_dataset_df.loc[:, "fake"] = balanced_dataset_df["fake"].astype(int)
+balanced_dataset_df.loc[:, "hatespeech"] = balanced_dataset_df["hatespeech"].astype(int)
+balanced_dataset_df.loc[:, "toxicity"] = balanced_dataset_df["toxicity"].astype(int)
 
 # Patching the issue when the prediction is NaN
 balanced_dataset_df = balanced_dataset_df.fillna(
