@@ -25,7 +25,7 @@ model_in_use_fmt = model_in_use.replace(":", "_").replace("/", "_")
 # Load the dataset
 balanced_dataset_main_df = pd.read_csv(DATA_PATH)
 # Sample the dataset
-balanced_dataset_df = balanced_dataset_main_df.sample(SAMPLE_COUNT)
+balanced_dataset_df = balanced_dataset_main_df.head(SAMPLE_COUNT)
 
 # Apply the prediction function
 tqdm.pandas(desc="Applying Classification")
