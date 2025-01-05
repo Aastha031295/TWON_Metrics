@@ -49,8 +49,8 @@ balanced_dataset_df["toxicity_predicted"] = pd.to_numeric(
 )
 
 # Ensure the true labels are also integers
-balanced_dataset_df.loc[:, "fake"] = balanced_dataset_df["fake"].astype(int)
-balanced_dataset_df.loc[:, "hatespeech"] = balanced_dataset_df["hatespeech"].astype(int)
+balanced_dataset_df.loc[:, "fake_news"] = balanced_dataset_df["fake_news"].astype(int)
+balanced_dataset_df.loc[:, "hate_speech"] = balanced_dataset_df["hate_speech"].astype(int)
 balanced_dataset_df.loc[:, "toxicity"] = balanced_dataset_df["toxicity"].astype(int)
 
 # Patching the issue when the prediction is NaN
@@ -66,22 +66,22 @@ balanced_dataset_df.to_csv(
 print("Evaluating... ⏳")
 # Generate classification reports
 fake_report = classification_report(
-    balanced_dataset_df["fake"],
+    balanced_dataset_df["fake_news"],
     balanced_dataset_df["fake_news_predicted"],
     zero_division=0,
     output_dict=True,
 )
 fake_report_df = pd.DataFrame(fake_report).transpose()
-fake_report_df["category"] = "fake"
+fake_report_df["category"] = "fake_news"
 
 hatespeech_report = classification_report(
-    balanced_dataset_df["hatespeech"],
+    balanced_dataset_df["hate_speech"],
     balanced_dataset_df["hate_speech_predicted"],
     zero_division=0,
     output_dict=True,
 )
 hatespeech_report_df = pd.DataFrame(hatespeech_report).transpose()
-hatespeech_report_df["category"] = "hatespeech"
+hatespeech_report_df["category"] = "hate_speech"
 
 toxicity_report = classification_report(
     balanced_dataset_df["toxicity"],

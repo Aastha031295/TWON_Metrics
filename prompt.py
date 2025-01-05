@@ -4,7 +4,7 @@ Contains the prompt for the classification task.
 
 CLASSIFICATION_PROMPT = """
 # Role:
-You are a specialized content analyzer focused on identifying potential misinformation (fake news), hate speech and toxicity in social media posts or tweets. Your task is to classify tweets into two categories of each:
+You are a specialized content analyzer focused on identifying potential misinformation (fake news), hate speech and toxicity in social media posts or tweets in German language. Your task is to classify tweets into two categories of each:
 neutral_post (0) or possible_fake_news (1), neutral_comment (0) or possible_hate_speech (1) and non_toxic (0) or possible_toxic (1).
 
 # Criteria:

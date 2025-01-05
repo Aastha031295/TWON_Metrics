@@ -18,8 +18,10 @@ UNI_MODELS = [
 ]
 
 # Configuration
+#Columns Required: text | fake_news | hate_speech  | toxicity
 DATA_PATH = "data/augmented_annotations.csv" # Path to the input dataset
-SAMPLE_COUNT = 300 # Number of samples to evaluate
+
+SAMPLE_COUNT = 200 # Number of samples to evaluate
 
 USE_UNI_LLM_API: bool = True # False to use Hugging Face API
 UNI_MODEL:str = UNI_MODELS[8] # Change the index to select a different model
