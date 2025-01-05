@@ -4,14 +4,21 @@ This script is used to evaluate the model by comparing the predicted labels with
 
 import pandas as pd
 from sklearn.metrics import classification_report
-from inference import predict
+from tqdm import tqdm
 
-from config import SAMPLE_COUNT, USE_UNI_LLM_API, UNI_MODEL, HG_MODEL, DATA_PATH
+from config import (
+    DATA_PATH,
+    HG_MODEL,
+    OUTPUT_FOLDER,
+    SAMPLE_COUNT,
+    UNI_MODEL,
+    USE_UNI_LLM_API,
+)
+from inference import predict
 
 model_in_use = UNI_MODEL if USE_UNI_LLM_API else HG_MODEL
 print(f"Using model: {model_in_use}")
 print(f"Sample count: {SAMPLE_COUNT}")
-print("Evaluating... ⏳")
 
 model_in_use_fmt = model_in_use.replace(":", "_").replace("/", "_")
 
@@ -21,7 +28,8 @@ balanced_dataset_main_df = pd.read_csv(DATA_PATH)
 balanced_dataset_df = balanced_dataset_main_df.sample(SAMPLE_COUNT)
 
 # Apply the prediction function
-balanced_dataset_df["response"] = balanced_dataset_df["text"].apply(predict)
+tqdm.pandas(desc="Applying Classification")
+balanced_dataset_df["response"] = balanced_dataset_df["text"].progress_apply(predict)
 
 # Split the response column into three separate columns
 response_split = balanced_dataset_df["response"].str.split(",", expand=True)
@@ -46,42 +54,50 @@ balanced_dataset_df["hatespeech"] = balanced_dataset_df["hatespeech"].astype(int
 balanced_dataset_df["toxicity"] = balanced_dataset_df["toxicity"].astype(int)
 
 # Patching the issue when the prediction is NaN
-balanced_dataset_df["fake_news_predicted"] = balanced_dataset_df[
-    "fake_news_predicted"
-].fillna(balanced_dataset_df["fake"])
-balanced_dataset_df["hate_speech_predicted"] = balanced_dataset_df[
-    "hate_speech_predicted"
-].fillna(balanced_dataset_df["hatespeech"])
-balanced_dataset_df["toxicity_predicted"] = balanced_dataset_df[
-    "toxicity_predicted"
-].fillna(balanced_dataset_df["toxicity"])
+balanced_dataset_df = balanced_dataset_df.fillna(
+    {"fake_news_predicted": -1, "hate_speech_predicted": -1, "toxicity_predicted": -1}
+)
 
 # Saving data in local file
-balanced_dataset_df.to_csv(f"output_{model_in_use_fmt}.csv", index=False)
+balanced_dataset_df.to_csv(
+    f"{OUTPUT_FOLDER}/output_{model_in_use_fmt}.csv", index=False
+)
 
+print("Evaluating... ⏳")
 # Generate classification reports
 fake_report = classification_report(
-    balanced_dataset_df["fake"], balanced_dataset_df["fake_news_predicted"], output_dict=True
+    balanced_dataset_df["fake"],
+    balanced_dataset_df["fake_news_predicted"],
+    zero_division=0,
+    output_dict=True,
 )
 fake_report_df = pd.DataFrame(fake_report).transpose()
-fake_report_df['category'] = 'fake'
+fake_report_df["category"] = "fake"
 
 hatespeech_report = classification_report(
-    balanced_dataset_df["hatespeech"], balanced_dataset_df["hate_speech_predicted"], output_dict=True
+    balanced_dataset_df["hatespeech"],
+    balanced_dataset_df["hate_speech_predicted"],
+    zero_division=0,
+    output_dict=True,
 )
 hatespeech_report_df = pd.DataFrame(hatespeech_report).transpose()
-hatespeech_report_df['category'] = 'hatespeech'
+hatespeech_report_df["category"] = "hatespeech"
 
 toxicity_report = classification_report(
-    balanced_dataset_df["toxicity"], balanced_dataset_df["toxicity_predicted"], output_dict=True
+    balanced_dataset_df["toxicity"],
+    balanced_dataset_df["toxicity_predicted"],
+    zero_division=0,
+    output_dict=True,
 )
 toxicity_report_df = pd.DataFrame(toxicity_report).transpose()
-toxicity_report_df['category'] = 'toxicity'
+toxicity_report_df["category"] = "toxicity"
 
 # Concatenate all reports into a single DataFrame
-combined_report_df = pd.concat([fake_report_df, hatespeech_report_df, toxicity_report_df])
+combined_report_df = pd.concat(
+    [fake_report_df, hatespeech_report_df, toxicity_report_df]
+)
 
 # Save the combined report to a CSV file
-combined_report_df.to_csv(f"eval_{model_in_use_fmt}.csv", index=True)
+combined_report_df.to_csv(f"{OUTPUT_FOLDER}/eval_{model_in_use_fmt}.csv", index=True)
 
 print(f"Evaluation completed. Check the output files ({model_in_use_fmt}).")

@@ -18,10 +18,12 @@ UNI_MODELS = [
 ]
 
 # Configuration
-DATA_PATH = "balanced_dataset.csv" # Path to the dataset
-SAMPLE_COUNT = 30 # Number of samples to evaluate
+DATA_PATH = "data/augmented_annotations.csv" # Path to the input dataset
+SAMPLE_COUNT = 300 # Number of samples to evaluate
 
 USE_UNI_LLM_API: bool = True # False to use Hugging Face API
 UNI_MODEL:str = UNI_MODELS[9] # Change the index to select a different model
 HG_MODEL: str = "facebook/bart-large" # Hugging Face model to use
 TEMPERATURE: float = 0.3 # Value between 0.0 and 1.0 to control the randomness of the predictions
+
+OUTPUT_FOLDER = "output" # Folder to save the output CSV files

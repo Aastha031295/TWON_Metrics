@@ -5,10 +5,8 @@ Ref
 
 import requests
 
+from config import TEMPERATURE, UNI_MODEL, USE_UNI_LLM_API
 from prompt import CLASSIFICATION_PROMPT
-
-from config import USE_UNI_LLM_API, UNI_MODEL, TEMPERATURE
-
 
 UNI_LLM_API: str = "https://inf.cl.uni-trier.de/chat/"
 
@@ -33,6 +31,7 @@ def predict_with_uni_llm(tweet):
         print(response)
         print(f"Error: {repr(exc)}")
         raise exc
+
 
 def predict(tweet):
     if USE_UNI_LLM_API:
