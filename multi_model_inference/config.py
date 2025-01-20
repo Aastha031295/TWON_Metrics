@@ -1,4 +1,3 @@
-
 UNI_MODELS = [
     # LLama (MetaAI)
     "llama3.1:8b-instruct-q6_K", #0
@@ -19,13 +18,13 @@ UNI_MODELS = [
 
 # Configuration
 #Columns Required: text | fake_news | hate_speech  | toxicity
-DATA_PATH = "data/augmented_annotations.csv" # Path to the input dataset
+DATA_PATH = "/home/s2aashre/TWON_Metrics/data/merged_dataset_18jan.csv" # Path to the input dataset
 
-SAMPLE_COUNT = 200 # Number of samples to evaluate
+#SAMPLE_COUNT = 5000 # Number of samples to evaluate
 
 USE_UNI_LLM_API: bool = True # False to use Hugging Face API
-UNI_MODEL:str = UNI_MODELS[8] # Change the index to select a different model
-HG_MODEL: str = "facebook/bart-large" # Hugging Face model to use
+UNI_MODEL:str = UNI_MODELS[1] # Change the index to select a different model
+# HG_MODEL: str = "facebook/bart-large" # Hugging Face model to use
 TEMPERATURE: float = 0.3 # Value between 0.0 and 1.0 to control the randomness of the predictions
 
 OUTPUT_FOLDER = "output" # Folder to save the output CSV files
