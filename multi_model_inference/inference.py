@@ -25,11 +25,13 @@ def predict_with_uni_llm(tweet):
             UNI_LLM_API,
             json={"model": UNI_MODEL, "messages": messages, "options": options},
         )
-        response_json = response.json()
-        return response_json["response"]
+        if response.status_code in [200, 201]:
+            response_json = response.json()
+            return response_json["response"]
+        else:
+            raise Exception(f"Failed inference: {response}")
     except Exception as exc:
         print(response)
-        print(f"Error: {repr(exc)}")
         raise exc
 
 
