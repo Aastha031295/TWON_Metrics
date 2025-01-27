@@ -4,7 +4,7 @@ import sklearn.metrics
 from openai import AsyncOpenAI
 
 # Configuration
-API_KEY = "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"  # Replace with your OpenAI API key
+API_KEY = ""  # Replace with your OpenAI API key
 DATA_FILE = "/home/s2shsinh/TWON_Metrics/unified/merged_dataset_19jan.csv"
 OUTPUT_FILE = "/home/s2shsinh/TWON_Metrics/unified/predictionsFinal19jan2025.csv"
 N_SAMPLES = 15000
