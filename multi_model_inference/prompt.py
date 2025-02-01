@@ -57,21 +57,21 @@ Important Guidelines:
 Examples
 
 Fake News Detection:
-- Text: "NASA confirms that the moon will turn green for the first time in 2025."  
+- Text: "Die NASA bestätigt, dass der Mond im Jahr 2025 zum ersten Mal grün sein wird."  
   Label: `1` (Fake News)  
-- Text: "The World Health Organization released new guidelines for mental health."  
+- Text: "Die Weltgesundheitsorganisation hat neue Leitlinien für die psychische Gesundheit veröffentlicht."  
   Label: `0` (Not Fake News)
 
 Hate Speech Classification:
-- Text: "Women are lazy and don't contribute to society."  
+- Text: "Frauen sind faul und leisten keinen Beitrag zur Gesellschaft."  
   Label: `1` (Hate Speech)  
-- Text: "We need to work together to build a better future."  
+- Text: "Wir müssen zusammenarbeiten, um eine bessere Zukunft zu schaffen."  
   Label: `0` (Not Hate Speech)
 
 Toxicity Detection:
-- Text: "You are the worst person I’ve ever met. I hope you fail at everything."  
+- Text: "Du bist der schlimmste Mensch, den ich je getroffen habe. Ich hoffe, du versagst bei allem."  
   Label: `1` (Toxic)  
-- Text: "Thank you for your help. I really appreciate it."  
+- Text: "Ich danke Ihnen für Ihre Hilfe. Ich weiß das wirklich zu schätzen."  
   Label: `0` (Not Toxic)
 
  Instructions:
