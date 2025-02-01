@@ -27,14 +27,8 @@ def predict_with_uni_llm(tweet):
         )
         
         payload = {"model": UNI_MODEL, "messages": messages, "options": options}
-
-        print(f"Sending request to API: {UNI_LLM_API}")
-        print(f"Payload: {payload}")
-
         response = requests.post(UNI_LLM_API, json=payload)
-
-        print(f"Response Status Code: {response.status_code}")
-        print(f"Response Text: {response.text}")
+        # print(f"Response Text: {response.text}")
 
         if response.status_code in [200, 201]:
             response_json = response.json()

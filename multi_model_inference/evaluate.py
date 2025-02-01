@@ -10,7 +10,7 @@ from config import (
     DATA_PATH,
     OUTPUT_FOLDER,
     UNI_MODEL,
-    USE_UNI_LLM_API,
+    SAMPLE_COUNT,
 )
 from inference import predict
 
@@ -21,6 +21,10 @@ model_in_use_fmt = model_in_use.replace(":", "_").replace("/", "_")
 
 # Load the dataset
 balanced_dataset_main_df = pd.read_csv(DATA_PATH)
+
+if SAMPLE_COUNT > 0:
+    print(f"Sampling {SAMPLE_COUNT} dataset...")
+    balanced_dataset_main_df = balanced_dataset_main_df.sample(SAMPLE_COUNT)
 
 # Apply the prediction function
 tqdm.pandas(desc="Applying Classification")
@@ -38,19 +42,22 @@ for column in ["fake_news", "hate_speech", "toxicity"]:
         balanced_dataset_main_df[column], errors="coerce"
     )
 
-# Replace invalid entries (e.g., NaN) with -1
+# Replace invalid entries (e.g., NaN) with -1 for the labeled columns
 balanced_dataset_main_df.fillna({col: -1 for col in ["fake_news", "hate_speech", "toxicity"]}, inplace=True)
 
 # Convert predictions to integers
+############
+# Replace invalid entries with 0 for the predicted columns
+############
 balanced_dataset_main_df["fake_news_predicted"] = pd.to_numeric(
     balanced_dataset_main_df["fake_news_predicted"], errors="coerce"
-).fillna(-1).astype(int)
+).fillna(0).astype(int)
 balanced_dataset_main_df["hate_speech_predicted"] = pd.to_numeric(
     balanced_dataset_main_df["hate_speech_predicted"], errors="coerce"
-).fillna(-1).astype(int)
+).fillna(0).astype(int)
 balanced_dataset_main_df["toxicity_predicted"] = pd.to_numeric(
     balanced_dataset_main_df["toxicity_predicted"], errors="coerce"
-).fillna(-1).astype(int)
+).fillna(0).astype(int)
 
 # Save predictions to CSV
 balanced_dataset_main_df.to_csv(
