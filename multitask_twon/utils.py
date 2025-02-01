@@ -1,15 +1,17 @@
+import os
 import torch
 from transformers import BertTokenizer
 from model import MultiTaskModel
+from config import MODEL_PATH
 
-def load_model(model_path, device):
+def load_model(device):
     """
-    Load the trained multi-task model.
+    Load the trained multi-task model onto the specified device (CPU or GPU).
     """
-    model = MultiTaskModel()
-    model.load_state_dict(torch.load(model_path, map_location=device))
-    model.to(device)
-    model.eval()
+    model = MultiTaskModel()  # Initialize your model
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=device))  # Load the model weights from the specified path
+    model.to(device)  # Move the model to the specified device
+    model.eval()  # Set the model to evaluation mode
     return model
 
 def load_tokenizer():
@@ -18,8 +20,6 @@ def load_tokenizer():
     """
     return BertTokenizer.from_pretrained("bert-base-german-cased")
 
-import os
-import pandas as pd
 
 def save_predictions(df, output_path, file_name="predictions.csv"):
     """

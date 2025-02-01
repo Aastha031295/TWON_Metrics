@@ -28,11 +28,11 @@ class SocialMediaDataset(Dataset):
             "text": text
         }
 
-def load_dataset(file_path, sample_count=None):
+def load_dataset(file_path):
     """
-    Load and optionally sample a dataset.
+    Load dataset and check for correctness.
     """
     df = pd.read_csv(file_path)
-    if sample_count:
-        df = df.sample(sample_count)
+    print(f"Dataset loaded: {len(df)} rows")
+    print(df.head())  # Show some sample rows
     return df
