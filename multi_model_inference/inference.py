@@ -14,18 +14,14 @@ options = {"seed": 42, "temperature": TEMPERATURE, "num_predict": 128}
 
 
 def predict_with_uni_llm(tweet):
+    response=None
     try:
         messages = [
             {"role": "system", "content": CLASSIFICATION_PROMPT},
             {"role": "user", "content": tweet},
             
         ]
-
-        response = requests.post(
-            UNI_LLM_API,
-            json={"model": UNI_MODEL, "messages": messages, "options": options},
-        )
-        
+   
         payload = {"model": UNI_MODEL, "messages": messages, "options": options}
         response = requests.post(UNI_LLM_API, json=payload)
         # print(f"Response Text: {response.text}")

@@ -1,7 +1,3 @@
-"""
-This script evaluates the model by comparing the predicted labels with the true labels.
-"""
-
 import pandas as pd
 from sklearn.metrics import classification_report
 from tqdm import tqdm
@@ -19,87 +15,66 @@ print(f"Using model: {model_in_use}")
 
 model_in_use_fmt = model_in_use.replace(":", "_").replace("/", "_")
 
-# Load the dataset
+# Load Dataset
 balanced_dataset_main_df = pd.read_csv(DATA_PATH)
 
+# Sample Data (if required)
 if SAMPLE_COUNT > 0:
     print(f"Sampling {SAMPLE_COUNT} dataset...")
     balanced_dataset_main_df = balanced_dataset_main_df.sample(SAMPLE_COUNT)
 
-# Apply the prediction function
+# Apply Prediction Function
 tqdm.pandas(desc="Applying Classification")
 balanced_dataset_main_df["response"] = balanced_dataset_main_df["text"].progress_apply(predict)
 
-# Split the response column into three separate columns
+# Extract Predictions
 response_split = balanced_dataset_main_df["response"].str.split(",", expand=True)
 balanced_dataset_main_df["fake_news_predicted"] = response_split[0]
 balanced_dataset_main_df["hate_speech_predicted"] = response_split[1]
 balanced_dataset_main_df["toxicity_predicted"] = response_split[2]
 
-# Ensure all label columns are converted to integers
+# Convert labels to numeric
 for column in ["fake_news", "hate_speech", "toxicity"]:
     balanced_dataset_main_df[column] = pd.to_numeric(
         balanced_dataset_main_df[column], errors="coerce"
     )
 
-# Replace invalid entries (e.g., NaN) with -1 for the labeled columns
-balanced_dataset_main_df.fillna({col: -1 for col in ["fake_news", "hate_speech", "toxicity"]}, inplace=True)
+# Convert Predictions to Numeric & Fill NaN with 0
+for col in ["fake_news_predicted", "hate_speech_predicted", "toxicity_predicted"]:
+    balanced_dataset_main_df[col] = pd.to_numeric(
+        balanced_dataset_main_df[col], errors="coerce"
+    ).fillna(0).astype(int)
 
-# Convert predictions to integers
-############
-# Replace invalid entries with 0 for the predicted columns
-############
-balanced_dataset_main_df["fake_news_predicted"] = pd.to_numeric(
-    balanced_dataset_main_df["fake_news_predicted"], errors="coerce"
-).fillna(0).astype(int)
-balanced_dataset_main_df["hate_speech_predicted"] = pd.to_numeric(
-    balanced_dataset_main_df["hate_speech_predicted"], errors="coerce"
-).fillna(0).astype(int)
-balanced_dataset_main_df["toxicity_predicted"] = pd.to_numeric(
-    balanced_dataset_main_df["toxicity_predicted"], errors="coerce"
-).fillna(0).astype(int)
-
-# Save predictions to CSV
+# Save Predictions
 balanced_dataset_main_df.to_csv(
     f"{OUTPUT_FOLDER}/output_{model_in_use_fmt}.csv", index=False
 )
 
 print("Evaluating... ⏳")
 
-# Generate classification reports
-fake_report = classification_report(
-    balanced_dataset_main_df["fake_news"],
-    balanced_dataset_main_df["fake_news_predicted"],
-    zero_division=0,
-    output_dict=True,
-)
-fake_report_df = pd.DataFrame(fake_report).transpose()
-fake_report_df["category"] = "fake_news"
+# Function for `-1` Handling per Feature
+def evaluate_feature(true_col, pred_col, category):
+    """
+    Evaluates a single feature while ignoring `-1` values.
+    """
+    valid_indices = balanced_dataset_main_df[true_col] != -1  # Ignore only for this feature
+    y_true = balanced_dataset_main_df.loc[valid_indices, true_col]  # Valid labels (0,1)
+    y_pred = balanced_dataset_main_df.loc[valid_indices, pred_col]  # Corresponding predictions
 
-hatespeech_report = classification_report(
-    balanced_dataset_main_df["hate_speech"],
-    balanced_dataset_main_df["hate_speech_predicted"],
-    zero_division=0,
-    output_dict=True,
-)
-hatespeech_report_df = pd.DataFrame(hatespeech_report).transpose()
-hatespeech_report_df["category"] = "hate_speech"
+    report = classification_report(y_true, y_pred, zero_division=0, output_dict=True)
+    report_df = pd.DataFrame(report).transpose()
+    report_df["category"] = category
+    return report_df
 
-toxicity_report = classification_report(
-    balanced_dataset_main_df["toxicity"],
-    balanced_dataset_main_df["toxicity_predicted"],
-    zero_division=0,
-    output_dict=True,
-)
-toxicity_report_df = pd.DataFrame(toxicity_report).transpose()
-toxicity_report_df["category"] = "toxicity"
+# Compute Reports with `-1` Handling
+fake_news_report = evaluate_feature("fake_news", "fake_news_predicted", "fake_news")
+hate_speech_report = evaluate_feature("hate_speech", "hate_speech_predicted", "hate_speech")
+toxicity_report = evaluate_feature("toxicity", "toxicity_predicted", "toxicity")
 
-# Concatenate all reports into a single DataFrame
-combined_report_df = pd.concat(
-    [fake_report_df, hatespeech_report_df, toxicity_report_df]
-)
+# Merge Reports
+combined_report_df = pd.concat([fake_news_report, hate_speech_report, toxicity_report])
 
-# Save the combined report to a CSV file
+# Save Evaluation Report
 combined_report_df.to_csv(f"{OUTPUT_FOLDER}/eval_{model_in_use_fmt}.csv", index=True)
 
-print(f"Evaluation completed. Check the output files ({model_in_use_fmt}).")
+print(f" Evaluation Completed. Check output files: {model_in_use_fmt}.")

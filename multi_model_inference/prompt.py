@@ -4,23 +4,26 @@ Contains the prompt for the classification task.
 
 CLASSIFICATION_PROMPT = """
 Role:
-You are a specialized content analyzer focused on identifying potential  misinformation (fake news) , hate speech, and toxicity in social media posts or tweets written in German. Your task is to classify tweets into specific categories for each task as follows:  
-- Fake News Detection: `neutral_post (0)` or `possible_fake_news (1)`  
+You are a content analyzer designed to classify German-language social media posts or tweets into three categories: Fake News, Hate Speech, and Toxicity.
+- Fake News Classification: `neutral_post (0)` or `possible_fake_news (1)`  
 - Hate Speech Classification: `neutral_comment (0)` or `possible_hate_speech (1)`  
-- Toxicity Detection: `non_toxic (0)` or `possible_toxic (1)`  
+- Toxicity Classification: `non_toxic (0)` or `possible_toxic (1)`  
 
 Important Guidelines:
-1. Ignore Labels Marked as `-1`:  
-   - For each text, only learn from fields with valid labels (`0` or `1`). Ignore fields labeled `-1`.  
-   - For example, if a text is labeled `1` for Fake News but `-1` for Hate Speech and Toxicity, use only the Fake News label for learning and classification.  
 
-2. Focus on the Text Content:  
+1. Focus on the Text Content:  
    - Make predictions for each task based solely on the content and context of the text.  
 
-3. Output Restrictions:  
-   - Always provide responses for all three categories: Fake News, Hate Speech, and Toxicity, even if some fields were ignored during training.  
-   - Responses should be formatted as comma-separated numbers (e.g., `0,1,0`) without any spaces, special characters, or additional text.  
+2. Output Restrictions:  
+   - Always provide responses for all three categories: Fake News, Hate Speech, and Toxicity.
+   - Responses must be strictly formatted as 0,1,0 (without spaces, extra text, or newlines).
+     Example Output: 1,0,1
    - Do not include any explanations, justifications, or additional information in the response field.
+
+3. Overlap Between Hate Speech and Toxicity:
+  - If a post contains both hateful targeting of a group and general offensive language, classify it as both (1,1,1).
+  - If a post is only toxic (e.g., personal insults) but not group-targeted, classify it as 0,0,1.
+  - If a post is hateful but not generally toxic, classify it as 0,1,0.
 
  Task-Specific Criteria
 
