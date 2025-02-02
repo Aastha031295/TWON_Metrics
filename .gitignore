@@ -164,3 +164,4 @@ cython_debug/
 # Ignore files starting with ~$
 ~$*
 
+*.csv
