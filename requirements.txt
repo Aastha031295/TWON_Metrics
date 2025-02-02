@@ -1,0 +1,7 @@
+streamlit>=1.25.0
+transformers>=4.28.1
+torch>=2.0.1  # For CPU
+# Uncomment the following line for GPU
+# torch==2.0.1+cu118  # Ensure this matches your CUDA version
+pandas>=2.1.0
+matplotlib>=3.7.2
